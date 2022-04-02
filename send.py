@@ -24,7 +24,7 @@ def transfer_ed_ksm(keypair, dest):
         )
 
     
-        extrinsic = substrate.create_signed_extrinsic(call=call, keypair=keypair)
+        extrinsic = substrate.create_signed_extrinsic(call=call, keypair=keypair, era={'period': 64})
     
         receipt = substrate.submit_extrinsic(extrinsic, wait_for_inclusion=True)
         print("Extrinsic '{}' sent and included in block '{}'".format(receipt.extrinsic_hash, receipt.block_hash))
@@ -45,7 +45,7 @@ def transfer_asset(keypair, asset_id, dest, amount):
             }
         )
 
-        extrinsic = substrate.create_signed_extrinsic(call=call, keypair=keypair)
+        extrinsic = substrate.create_signed_extrinsic(call=call, keypair=keypair, era={'period': 64})
 
         receipt = substrate.submit_extrinsic(extrinsic, wait_for_inclusion=True)
         print("Extrinsic '{}' sent and included in block '{}'".format(receipt.extrinsic_hash, receipt.block_hash))

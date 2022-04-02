@@ -18,7 +18,7 @@ Note: You will need to enter your seed phrase for the account at the command lin
 
 ### Example
 
-This example sends 100 Billcoins (asset ID 223) to the addresses found in filename.txt. Note that of course this is a dummy seed phrase; you will need to make your own Statemine account and fund it with KSM and the asset you wish to send.
+This example sends 100 Billcoins (asset ID 223) to the addresses found in filename.txt. This is of course a dummy seed phrase; you will need to make your own Statemine account and fund it with KSM and the asset you wish to send.
 
 ```
 python3 send.py 223 10000000000 filename.txt "end cry link reason crunch shine enroll supreme boost cluster fame devote"
@@ -36,11 +36,7 @@ Ideally, this would support Statemine/Statemint selection from the command line.
 
 Use `cat file.txt | grep -o "[CDEFGHIJKLMN][a-zA-Z0-9]\{45\}[a-zA-Z0-9]*" | uniq` to get a list of all Kusama addresses in file.txt
 
-## Ideas for Improvement
-
-1. Statemine/Statemint selector
-2. Uses batch transactions (would also be much faster!)
-3. Check that account exists before sending ED; don't sent it if it does
+Note that there is a bug where this regex will occasionally pick up Substrate (5...) addresses, but missing the 5 prefix. These will be ignored by send.py, though, since they are not valid Kusama addresses (even though they look like them!)
 
 ## Acknowledgements
 
