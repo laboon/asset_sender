@@ -8,8 +8,7 @@ from substrateinterface.exceptions import SubstrateRequestException
 STATEMINE_EXISTENTIAL_DEPOSIT = 3333333
 STATEMINE_NODE = "wss://statemine-rpc.polkadot.io"
 
-# NOTE - This is 100 Billcoins in Plancks.
-# 10000000000
+# 10000000000 = 100 Billcoins (8 decimal places)
 
 def transfer_ed_ksm(keypair, dest):
     try:
@@ -52,6 +51,93 @@ def transfer_asset(keypair, asset_id, dest, amount):
 
     except SubstrateRequestException as e:
         print("Failed to send: {}".format(e))
+
+# This is ugly, and should probably be changed...
+# Returns true if address is valid, false if not
+def check_if_valid_address(addr):
+    try:
+        temp_call = substrate.compose_call(
+            call_module='Balances',
+            call_function='transfer',
+            call_params={
+                'dest': addr,
+                'value': STATEMINE_EXISTENTIAL_DEPOSIT
+            }
+        )
+        return True
+    except:
+        return False
+    
+        
+def batch_send_eds(keypair, dest_list):
+
+    try:
+
+        calls = []
+        for dest in dest_list:
+            call = substrate.compose_call(
+                call_module='Balances',
+                call_function='transfer',
+                call_params={
+                    'dest': dest,
+                    'value': STATEMINE_EXISTENTIAL_DEPOSIT
+                }
+            )
+            calls.append(call)
+
+        call = substrate.compose_call(
+            call_module='Utility',
+            call_function='batch',
+            call_params={
+                'calls': calls
+            }
+        )
+
+    
+        extrinsic = substrate.create_signed_extrinsic(call=call, keypair=keypair, era={'period': 64})
+        
+        receipt = substrate.submit_extrinsic(extrinsic, wait_for_inclusion=True)
+        print("Extrinsic '{}' sent and included in block '{}'".format(receipt.extrinsic_hash, receipt.block_hash))
+
+    except SubstrateRequestException as e:
+        print("Failed to send: {}".format(e))
+
+
+    
+def batch_send_assets(keypair, asset_id, dest_list, amount):
+    
+    try:
+
+        calls = []
+        for dest in dest_list:
+            call = substrate.compose_call(
+                call_module='Assets',
+                call_function='transfer',
+                call_params={
+                    'id': asset_id,
+                    'target': dest,
+                    'amount': amount
+                }
+            )
+            calls.append(call)
+
+        call = substrate.compose_call(
+            call_module='Utility',
+            call_function='batch',
+            call_params={
+                'calls': calls
+            }
+        )
+
+    
+        extrinsic = substrate.create_signed_extrinsic(call=call, keypair=keypair, era={'period': 64})
+        
+        receipt = substrate.submit_extrinsic(extrinsic, wait_for_inclusion=True)
+        print("Extrinsic '{}' sent and included in block '{}'".format(receipt.extrinsic_hash, receipt.block_hash))
+
+    except SubstrateRequestException as e:
+        print("Failed to send: {}".format(e))
+
 
 
 ##########################################
@@ -99,18 +185,29 @@ text_file.close()
 print(" done!")
 
 num_addresses = 0
+dest_list = []
 
 for line in lines:
     address = line.rstrip('\n')
     if len(address) < 2:
-        break
-    print("Sending ED to " + address + "...")
-    transfer_ed_ksm(keypair, address)
-    print(" done!");
-    print("Sending " + amount + " of asset ID " + asset_id + " to " + address + "...")
-    transfer_asset(keypair, 223, address, 10000000000)
-    print(" done!")
+        continue
+    if check_if_valid_address(address) == False:
+        print(address + " is not a valid Statemine address, skipping.")
+        continue
+    
     num_addresses += 1
+    print("Adding " + address + " to list")
+    dest_list.append(address)
+
+print("Sending EDs in batch...")
+batch_send_eds(keypair, dest_list)
+print("done!")
+
+print("Sending assets in batch...")
+batch_send_assets(keypair, asset_id, dest_list, amount)
+print("done!")
+
+
 
 print("Sent asset " + asset_id + " to " + str(num_addresses) + " accounts.")
 
