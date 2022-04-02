@@ -12,18 +12,20 @@ STATEMINE_NODE = "wss://statemine-rpc.polkadot.io"
 # 10000000000
 
 def transfer_ed_ksm(keypair, dest):
-    call = substrate.compose_call(
-        call_module='Balances',
-        call_function='transfer',
-        call_params={
-            'dest': dest,
-            'value': STATEMINE_EXISTENTIAL_DEPOSIT
-        }
-    )
-
-    extrinsic = substrate.create_signed_extrinsic(call=call, keypair=keypair)
-
     try:
+
+        call = substrate.compose_call(
+            call_module='Balances',
+            call_function='transfer',
+            call_params={
+                'dest': dest,
+                'value': STATEMINE_EXISTENTIAL_DEPOSIT
+            }
+        )
+
+    
+        extrinsic = substrate.create_signed_extrinsic(call=call, keypair=keypair)
+    
         receipt = substrate.submit_extrinsic(extrinsic, wait_for_inclusion=True)
         print("Extrinsic '{}' sent and included in block '{}'".format(receipt.extrinsic_hash, receipt.block_hash))
 
@@ -31,19 +33,20 @@ def transfer_ed_ksm(keypair, dest):
         print("Failed to send: {}".format(e))
 
 def transfer_asset(keypair, asset_id, dest, amount):
-    call = substrate.compose_call(
-        call_module='Assets',
-        call_function='transfer',
-        call_params={
-            'id': asset_id,
-            'target': dest,
-            'amount': amount
-        }
-    )
-
-    extrinsic = substrate.create_signed_extrinsic(call=call, keypair=keypair)
-
     try:
+
+        call = substrate.compose_call(
+            call_module='Assets',
+            call_function='transfer',
+            call_params={
+                'id': asset_id,
+                'target': dest,
+                'amount': amount
+            }
+        )
+
+        extrinsic = substrate.create_signed_extrinsic(call=call, keypair=keypair)
+
         receipt = substrate.submit_extrinsic(extrinsic, wait_for_inclusion=True)
         print("Extrinsic '{}' sent and included in block '{}'".format(receipt.extrinsic_hash, receipt.block_hash))
 
@@ -67,7 +70,7 @@ asset_id = sys.argv[1]
 amount = sys.argv[2]
 filename = sys.argv[3]
 seed = sys.argv[4]
-    
+
 # Connect to node. By default this goes to Statemine, just change RPC endpoint to
 # Statemint to use that instead.
 
