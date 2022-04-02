@@ -15,6 +15,7 @@ Note: You will need to enter your seed phrase for the account at the command lin
 2. amount_in_placks - The amount in Plancks you will send to each account. Note that different Statemine assets have different levels of precision!
 3. filename - The filename to read, which should contain a list of Kusama addresses, one per line
 4. seed_phrase_in_quotes - The seed phrase of the account from which a keypair will be generated and KSM/assets sent. Of course this account must already have some KSM and the asset you wish to send!
+5. -P - Optional flag to determine whether to use Polkadot (Statemint) or Kusama (Statemine), omit for Kusama.
 
 ### Example
 
