@@ -167,9 +167,6 @@ amount = sys.argv[2]
 filename = sys.argv[3]
 seed = sys.argv[4]
 
-print(EXISTENTIAL_DEPOSIT)
-print(NODE_WSS)
-
 # Connect to node. By default this goes to Statemine, just change RPC endpoint to
 # Statemint to use that instead.
 
