@@ -4,13 +4,21 @@ from substrateinterface import SubstrateInterface, Keypair
 from substrateinterface.exceptions import SubstrateRequestException
 
 # Note that this is in Plancks.
-# The Statemine ED is 1/10th that of the Kusama ED.
-STATEMINE_EXISTENTIAL_DEPOSIT = 3333333
-STATEMINE_NODE = "wss://statemine-rpc.polkadot.io"
+# The Statemine ED is 1/10th that of the Kusama ED, the same is true for statemint on Polkadot.
+EXISTENTIAL_DEPOSIT = 3333333
+NODE_WSS = "wss://statemine-rpc.polkadot.io"
+for i in sys.argv:
+    # Signal to use statemint on Polkadot P or Statemine on Kusama
+    if i == "-P":
+        sys.argv.remove("-P")
+        EXISTENTIAL_DEPOSIT = 10_000_000_00
+        NODE_WSS = "wss://statemint-rpc.polkadot.io"
 
+print(EXISTENTIAL_DEPOSIT)
+print(NODE_WSS)
 # 10000000000 = 100 Billcoins (8 decimal places)
 
-def transfer_ed_ksm(keypair, dest):
+def transfer_ed(keypair, dest):
     try:
 
         call = substrate.compose_call(
@@ -18,7 +26,7 @@ def transfer_ed_ksm(keypair, dest):
             call_function='transfer',
             call_params={
                 'dest': dest,
-                'value': STATEMINE_EXISTENTIAL_DEPOSIT
+                'value': EXISTENTIAL_DEPOSIT
             }
         )
 
@@ -61,7 +69,7 @@ def check_if_valid_address(addr):
             call_function='transfer',
             call_params={
                 'dest': addr,
-                'value': STATEMINE_EXISTENTIAL_DEPOSIT
+                'value': EXISTENTIAL_DEPOSIT
             }
         )
         return True
@@ -80,7 +88,7 @@ def batch_send_eds(keypair, dest_list):
                 call_function='transfer',
                 call_params={
                     'dest': dest,
-                    'value': STATEMINE_EXISTENTIAL_DEPOSIT
+                    'value': EXISTENTIAL_DEPOSIT
                 }
             )
             calls.append(call)
@@ -163,7 +171,7 @@ seed = sys.argv[4]
 print("Connecting to node...", end='')
 
 substrate = SubstrateInterface(
-    url=STATEMINE_NODE
+    url=NODE_WSS
 )
 
 print(" done!")
@@ -209,5 +217,5 @@ print("done!")
 
 
 
-print("Sent asset " + asset_id + " to " + str(num_addresses) + " accounts.")
+# print("Sent asset " + asset_id + " to " + str(num_addresses) + " accounts.")
 
